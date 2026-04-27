@@ -1,0 +1,16 @@
+# Setapp apps — install manually after signing into Setapp.app
+# Setapp doesn't expose a CLI, so this file is a checklist, not a script.
+#
+# Procedure:
+#   1. Install Setapp:  brew install --cask setapp     (or download from setapp.com)
+#   2. Open Setapp.app, sign in
+#   3. Install each app below from the Setapp catalog
+#
+# Apps (curated):
+CleanMyMac
+CleanShot X
+Dato
+NotePlan
+Paste
+Proxyman
+Spark Mail

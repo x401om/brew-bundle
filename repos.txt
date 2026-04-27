@@ -1,0 +1,35 @@
+# Repos to clone on a fresh machine.
+# Format: <github-owner>/<repo>  <local-dir-name>
+# Lines starting with # are comments.
+#
+# /mac-setup phase 9 reads this and runs:
+#   gh repo clone <owner>/<repo> ~/repos/<local-dir-name>
+
+# === MUST CLONE ===
+
+# Adapty
+adaptyteam/AdaptySDK-iOS                       ios-sdk
+adaptyteam/adapty-swift-app                    adapty-swift-app
+adaptyteam/UIBuilder-Gallery-Devtools          universal-gallery
+adaptyteam/AdaptySDK-iOS-UniversalDevtool      universal-devtool
+adaptyteam/AdaptySDK-iOS-Devtools              ios-devtools
+adaptyteam/AdaptySDK-Flutter                   flutter-sdk
+
+# Mindbots (axetopteam org)
+axetopteam/project-eris                        project-eris
+axetopteam/character-ai                        twins-ios
+axetopteam/character-ai-flutter                twins-flutter
+axetopteam/character_admin                     twins-admin
+vsochinsky/character-back                      twins-back
+axetopteam/cosmic-back                         cosmic-back
+axetopteam/mindbots-operations                 mindbots-operations
+
+# adapty-sdk-workspace — local Xcode/SwiftPM workspace, no git remote.
+# Recreate manually after cloning ios-sdk + sibling SDKs.
+
+# === ON DEMAND (clone manually when needed; skipped by /mac-setup) ===
+# axetopteam/glamai                            glamai
+# axetopteam/cosmic-flutter                    cosmic-flutter
+# axetopteam/doctor                            doctor
+# axetopteam/tea-flutter                       tea-flutter
+# adaptyteam/universal-gallery-legacy          universal-gallery-legacy

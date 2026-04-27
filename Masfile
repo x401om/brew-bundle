@@ -1,8 +1,14 @@
+# Mac App Store apps — install via:
+#   brew install mas
+#   mas signin <apple-id>
+#   mas install $(awk '/^[0-9]/ {print $1}' Masfile)
+#
+# Format: <id>  <name>  (<version-snapshot>)
+# DevCleaner removed (now via brew cask). Meeter dropped.
+
 1569813296  1Password for Safari  (8.11.20)
 1565826179  Caramba Switcher      (2025.11.17)
-1388020431  DevCleaner            (2.8.0)
  640199958  Developer             (10.8.3)
-1510445899  Meeter                (1.9.10)
  409201541  Pages                 (14.4)
 1504940162  RocketSim             (14.3.2)
  803453959  Slack                 (4.47.65)

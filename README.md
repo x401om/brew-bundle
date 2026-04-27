@@ -1,210 +1,164 @@
-# brew-bundle
+# brew-bundle — Aleksei's Mac bootstrap
 
-All-you-need software for development in a single Brewfile. This repository contains everything you need to restore your Mac development environment after a full reset.
+Everything needed to bring a fresh Mac to a fully working dev environment for:
 
-## Quick Start
+- **iOS** — Adapty SDK, devtools, gallery, native apps
+- **Flutter** — Adapty Flutter SDK, Twins, side projects
+- **Web / Capacitor** — project-eris (pnpm + turbo + Vite)
+- **Backend** — Firebase Cloud Functions (TypeScript)
 
-To install all apps and packages from the Brewfile:
+The hard parts (`brew bundle`, dotfiles, repos clone, OAuth flows) are automated by the `/mac-setup` skill that lives in this repo. You only do ~10 manual commands before launching it.
 
-```bash
-brew bundle install
-```
+---
 
-## Full Mac Restoration Guide
+## Phase A — On the OLD Mac (5 min, before migration)
 
-Follow these steps to completely restore your Mac development environment after a full reset:
-
-### Prerequisites
-
-1. **Install Xcode Command Line Tools** (required for Homebrew):
-   ```bash
-   xcode-select --install
-   ```
-
-2. **Install Homebrew** (if not already installed):
-   ```bash
-   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-   ```
-
-3. **Clone this repository** (or copy the Brewfile):
-   ```bash
-   git clone <your-repo-url> brew-bundle
-   cd brew-bundle
-   ```
-
-### Step 1: Install All Packages and Apps
-
-Install everything from the Brewfile:
+The only thing that can't be re-generated on the new Mac is the **GPG signing key** (id: `CE5189648157F28F`). Export it before reset.
 
 ```bash
-brew bundle install
+mkdir -p ~/Desktop/migration
+
+# Export GPG private key + ownertrust
+gpg --export-secret-keys --armor CE5189648157F28F > ~/Desktop/migration/gpg-private.asc
+gpg --export-ownertrust > ~/Desktop/migration/gpg-trust.txt
+
+# Make sure the latest Brewfile is pushed
+cd ~/repos/brew-bundle
+brew bundle dump --force                # snapshot current state into Brewfile
+git diff Brewfile                        # review changes
+git add -A && git commit -m "snapshot before migration"
+git push
 ```
 
-This will install:
-- All CLI tools and development libraries
-- All GUI applications (casks)
-- All required Homebrew taps
+**Transfer:** AirDrop the `~/Desktop/migration/` folder to the new Mac. It contains 2 small files (~10 KB).
 
-### Step 2: Install Mac App Store Apps (Optional)
+---
 
-If you use `mas-cli` to manage App Store apps, install it first:
+## Phase B — On the NEW Mac (10–15 min, manual)
+
+Fresh macOS, just past the setup assistant (Apple ID, iCloud, Wi-Fi, FileVault on).
+
+Open **Terminal.app** (built-in) and run:
 
 ```bash
-brew install mas
+# 1. Xcode Command Line Tools (needed for git, Homebrew, everything)
+xcode-select --install
+# → GUI dialog → "Install" → wait 5–10 min
 ```
-
-Then create a `Masfile` with your App Store apps:
-```bash
-mas list > Masfile
-```
-
-To restore App Store apps:
-```bash
-mas install $(cat Masfile | awk '{print $1}')
-```
-
-### Step 3: Restore Additional Configuration
-
-#### Git Configuration
-
-Set up your Git identity:
-```bash
-git config --global user.name "Your Name"
-git config --global user.email "your.email@example.com"
-```
-
-#### SSH Keys
-
-Restore your SSH keys from backup (if you have them):
-```bash
-# Copy your SSH keys to ~/.ssh/
-# Ensure proper permissions:
-chmod 700 ~/.ssh
-chmod 600 ~/.ssh/id_*
-```
-
-#### Shell Configuration
-
-Restore your shell configuration files (`.zshrc`, `.bash_profile`, etc.) from backup or version control.
-
-#### Node.js Global Packages
-
-If you had global npm packages, reinstall them:
-```bash
-npm install -g <package1> <package2> ...
-```
-
-#### Ruby Gems
-
-If using rbenv, install Ruby versions and gems:
-```bash
-rbenv install <version>
-gem install <gem1> <gem2> ...
-```
-
-#### CocoaPods
-
-CocoaPods is already installed via Homebrew. You may need to run:
-```bash
-pod setup
-```
-
-### Step 4: Verify Installation
-
-Check installed versions:
-```bash
-./generate-versions.sh
-cat VERSIONS.md
-```
-
-### Step 5: Update Packages
-
-Keep your packages up to date:
-```bash
-brew update
-brew upgrade
-brew bundle cleanup  # Remove packages not in Brewfile
-```
-
-## Managing the Brewfile
-
-### Adding New Packages
-
-1. Install the package:
-   ```bash
-   brew install <package>
-   # or
-   brew install --cask <app>
-   ```
-
-2. Add it to the Brewfile manually, or regenerate:
-   ```bash
-   brew bundle dump --force
-   ```
-
-3. Regenerate versions dump:
-   ```bash
-   ./generate-versions.sh
-   ```
-
-### Updating Versions Dump
-
-To update the versions dump with currently installed packages:
 
 ```bash
-./generate-versions.sh
+# 2. Homebrew
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# Add Homebrew to PATH for login shells
+echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
+eval "$(/opt/homebrew/bin/brew shellenv)"
 ```
 
-This creates/updates `VERSIONS.md` with all installed package versions from your Brewfile.
+```bash
+# 3. Minimum tools to bootstrap further
+brew install gh node
+```
 
-## What's Included
+### 4. SSH key + GitHub auth (one command, generates fresh key)
 
-### CLI Tools
-- Development tools (cocoapods, swiftformat, fastlane, etc.)
-- Language runtimes (node, ruby via rbenv)
-- Mobile development tools (firebase-cli, fvm, tuist)
-- Git tools (git-lfs)
-- System libraries and utilities
+```bash
+gh auth login
+```
 
-### GUI Applications
-- Development tools (Xcode extensions, terminals, simulators)
-- Version control clients
-- Browsers
-- Productivity apps
-- Quick Look plugins
+Answer the prompts:
 
-## Backup Checklist
+| Prompt | Answer |
+|---|---|
+| `What account do you want to log into?` | **GitHub.com** |
+| `What is your preferred protocol for Git operations?` | **SSH** |
+| `Generate a new SSH key to add to your GitHub account?` | **Yes** |
+| `Enter a passphrase for your new SSH key` | empty (Enter) or set one |
+| `Title for your SSH key` | e.g. `MacBook 2026` |
+| `How would you like to authenticate GitHub CLI?` | **Login with a web browser** |
+| `Copy your one-time code: XXXX-XXXX` | copy → Enter → browser opens → authorize |
 
-Before resetting your Mac, make sure to backup:
+**What this does automatically:**
 
-- [ ] This Brewfile repository
-- [ ] SSH keys (`~/.ssh/`)
-- [ ] Shell configuration files (`.zshrc`, `.bash_profile`, etc.)
-- [ ] Git configuration (`~/.gitconfig`)
-- [ ] List of global npm packages (`npm list -g --depth=0`)
-- [ ] List of Ruby gems (`gem list`)
-- [ ] App Store apps list (`mas list > Masfile`)
-- [ ] Any custom fonts
-- [ ] Xcode preferences and snippets
-- [ ] VS Code settings and extensions
-- [ ] Other application preferences
+- Generates `~/.ssh/id_ed25519` + `id_ed25519.pub`
+- Uploads the public key to your GitHub account
+- Logs `gh` in for API operations
+- Configures git to use SSH
 
-## Troubleshooting
+Verify:
 
-### Package Installation Fails
+```bash
+ssh -T git@github.com
+# → Hi x401om! You've successfully authenticated...
 
-If a package fails to install:
-1. Check if the tap is added: `brew tap`
-2. Update Homebrew: `brew update`
-3. Check for issues: `brew doctor`
+gh auth status
+# → ✓ Logged in to github.com as x401om
+# → ✓ Git operations protocol: ssh
+```
 
-### Missing Packages
+### 5. Clone this repo and launch the setup skill
 
-If packages are missing from the versions dump:
-- They may not be installed yet
-- Run `brew bundle install` to install missing packages
-- Regenerate versions: `./generate-versions.sh`
+```bash
+gh repo clone x401om/brew-bundle ~/repos/brew-bundle
+cd ~/repos/brew-bundle
 
-## License
+npm install -g @anthropic-ai/claude-code
 
-See [LICENSE](LICENSE) file for details.
+claude
+```
+
+Inside Claude:
+
+```
+/mac-setup
+```
+
+The skill takes over from here.
+
+---
+
+## Phase C — Inside `/mac-setup` (the skill drives)
+
+State is persisted in `.mac-setup-state.json` (gitignored). If you stop and re-run `/mac-setup`, it picks up where it left off.
+
+| Phase | What happens | Manual touch |
+|---|---|---|
+| 1. Foundation | verifies `gh`, `ssh`, drops `.gitconfig` from `dotfiles/` into `~` | none if already done in Phase B |
+| 2. Brewfile | `brew bundle install` (formulas + casks) | wait 15–30 min |
+| 3. nvm + Node 22 | install nvm, Node 22 LTS, `nvm alias default 22`, reinstall Claude Code on the nvm node, `corepack enable` | none |
+| 4. GPG import | imports `~/Downloads/migration/gpg-private.asc` + ownertrust, sets ultimate trust | "is the bundle in place? (y/n)" |
+| 5. Dotfiles | copies `.zshrc`, `.zprofile`, `.gitignore_global`, `.stCommitMsg` from `dotfiles/` into `~`, sources `.zshrc` | none |
+| 6. MAS + manual GUI | `mas signin`, installs from `Masfile`, prints checklist for Setapp / Firefoo / checkra1n / Collaborator | sign into Setapp.app |
+| 7. Per-domain | only what you need: `xcodes install <ver>`, `swiftly init`, `fvm install <vers>`, etc. | choose chunks |
+| 8. Service auth | walks through `gcloud auth login`, `gogcli auth me/work`, `firebase login`, Strava OAuth, Slack, Cursor, Xcode → Apple ID | each flow opens a browser |
+| 9. Repos | clones from `repos.txt` into `~/repos/` | confirm list |
+
+---
+
+## Files in this repo
+
+| File | Purpose |
+|---|---|
+| `Brewfile` | formulas + casks (source of truth) |
+| `Masfile` | Mac App Store apps |
+| `Setappfile` | Setapp catalog checklist (manual install) |
+| `repos.txt` | repos to clone (must / on-demand) |
+| `dotfiles/` | `.zshrc`, `.zprofile`, `.gitconfig`, `.gitignore_global`, `.stCommitMsg` |
+| `.claude/skills/mac-setup/` | the bootstrap skill (drives Phase C) |
+| `.claude/skills/mac-sync/` | run periodically to diff current state vs tracked Brewfile/Masfile/etc. |
+| `generate-versions.sh` | snapshot installed package versions into `VERSIONS.md` |
+
+---
+
+## Keeping the repo fresh
+
+Run `/mac-sync` from time to time (e.g. monthly). It will:
+
+1. `brew bundle dump --force` and diff against tracked `Brewfile`
+2. `mas list` and diff against `Masfile`
+3. `ls /Applications/Setapp/` and diff against `Setappfile`
+4. `npm list -g --depth=0` and diff against tracked globals
+5. Ask you per added/removed item: keep / drop / ignore
+6. Commit + push the curated changes
+
+This way the bootstrap stays in sync with your real environment, without dragging in everything you tried once.

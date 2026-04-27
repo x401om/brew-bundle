@@ -1,82 +1,95 @@
-# Homebrew Taps
-# Additional repositories for Homebrew packages
+# =============================================================================
+# Brewfile — Aleksei's Mac development environment
+# =============================================================================
+# Usage:
+#   brew bundle install
+#
+# This file is the source of truth for what Homebrew installs on a fresh Mac.
+# To regenerate from current state: brew bundle dump --force
+# To diff current vs tracked:        brew bundle check --verbose
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Taps
+# -----------------------------------------------------------------------------
 tap "homebrew/bundle"
 tap "xcodesorg/made"
 tap "leoafarias/fvm"
-tap "tuist/tuist"
-tap "tw93/tap"
 
-# ============================================================================
-# CLI Tools and Development Libraries
-# ============================================================================
+# -----------------------------------------------------------------------------
+# CLI tools
+# -----------------------------------------------------------------------------
 
-# Download with resuming and segmented downloading
-brew "aria2"
-# Dependency manager for Cocoa projects
-brew "cocoapods"
-# Formatting tool for reformatting Swift code
-brew "swiftformat"
-# Best command-line tool to install and switch between multiple versions of Xcode
-brew "xcodesorg/made/xcodes"
+# Shell + Git
+brew "gh"                              # GitHub CLI
+brew "git-lfs"                         # Git Large File Storage
+brew "gnupg"                           # GPG signing
+brew "pinentry-mac"                    # GPG passphrase entry on macOS
 
-# JavaScript Runtime
-# Open-source, cross-platform JavaScript runtime environment
-brew "node"
-# Node.js version 18 (LTS)
-brew "node@18"
+# Node version manager (single source of truth — no brew node*)
+brew "nvm"
 
-# Ruby Development
-# Ruby version manager
+# Ruby version manager (CocoaPods, Fastlane, gem-based tooling)
 brew "rbenv"
 
-# Mobile Development Tools
-# Easiest way to build and release mobile apps
-brew "fastlane"
-# Firebase command-line tools
-brew "firebase-cli"
-# Simple cli to manage Flutter SDK versions per project
-brew "leoafarias/fvm/fvm"
-# Create, maintain, and interact with Xcode projects at scale
-brew "tuist/tuist/tuist@4.55.6"
+# Mobile dev
+brew "cocoapods"                       # iOS dependency manager
+brew "fastlane"                        # iOS/Android release automation
+brew "swiftformat"                     # Swift code formatter
+brew "xcodesorg/made/xcodes"           # Xcode version manager (CLI)
+brew "leoafarias/fvm/fvm"              # Flutter version manager
 
-# Git Tools
-# Git extension for versioning large files
-brew "git-lfs"
-
-# System Libraries
-brew "glib"
-brew "harfbuzz"
+# Google
+brew "gogcli"                          # Multi-account Google CLI (Gmail/Calendar)
 
 # Utilities
-# Comprehensive macOS cleanup and application uninstall tool
-brew "tw93/tap/mole"
+brew "aria2"                           # Segmented downloader
+brew "asciidoctor"                     # AsciiDoc → HTML/PDF (universal-gallery docs)
+brew "tw93/tap/mole"                   # macOS cleanup utility (ad-hoc)
 
-# ============================================================================
-# GUI Applications
-# ============================================================================
+# -----------------------------------------------------------------------------
+# GUI applications (casks)
+# -----------------------------------------------------------------------------
 
-# Development Tools
-# Xcode Extension for reformatting Swift code
-cask "swiftformat-for-xcode"
-# Modern terminal
-cask "warp"
-# Xcode version manager GUI
-cask "xcodes"
-# Clean up Xcode derived data
-cask "devcleaner"
+# Password manager
+cask "1password"
+cask "1password-cli"
 
-# Version Control
-cask "sourcetree"
+# Terminal + editors
+cask "warp"                            # Primary terminal
+cask "visual-studio-code"
+cask "cursor"
 
 # Browsers
 cask "arc"
+cask "google-chrome"
 
-# Productivity & Utilities
+# AI tools
+cask "claude"
 cask "chatgpt"
-cask "lunar"
+cask "codex"
+cask "cmux"
 
-# Quick Look Plugins
-# Syntax highlighting for code files
-cask "qlcolorcode"
-# Quick Look plugin for plain text files
-cask "qlstephen"
+# Productivity
+cask "obsidian"                        # Cortex vault
+cask "dropbox"
+cask "spotify"
+
+# Networking + remote
+cask "nordvpn"
+cask "splashtop-business"
+
+# Display
+cask "betterdisplay"                   # Display config
+cask "lunar"                           # Display brightness/profiles
+
+# Cloud / dev services
+cask "gcloud-cli"
+
+# Xcode helpers
+cask "xcodes-app"                      # Xcode version manager (GUI)
+cask "swiftformat-for-xcode"
+cask "devcleaner"                      # Xcode derived data cleanup
+
+# Git GUI
+cask "sourcetree"                      # Used as git mergetool in .gitconfig
